@@ -1,0 +1,441 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM系统-费用详情</title>
+    <script src="assets/js/jquery-1.10.2.js"></script>
+    <!-- Bootstrap Styles-->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FontAwesome Styles-->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+    <!-- Morris Chart Styles-->
+    <link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
+    <!-- Custom Styles-->
+    <link href="assets/css/custom-styles.css" rel="stylesheet" />
+    <!-- Google Fonts-->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="assets/js/Lightweight-Chart/cssCharts.css">
+    <style type="text/css">
+    #msg{
+    height: 4rem;
+    text-align: center;
+    position: fixed;
+    top: 20%;
+    margin-top: -1rem;
+    line-height: 4rem;
+    width: 100%;
+    }
+    #msg span{
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    height: 4rem;
+    display: inline-block;
+    padding: 0 3rem;
+    border-radius: 5px;
+    }
+    </style>
+    <script type="text/javascript">
+    
+    $(function(){
+    	
+    	function alert(e){
+            $("body").append("<div id='msg'><span>"+e+"</span></div>");
+            clearmsg();
+        }
+        function clearmsg(){
+            var t = setTimeout(function(){
+                $("#msg").remove();
+            },2000)
+        };
+        
+        getName();
+    	
+    	getMenu();
+    	
+    })
+    function getName(){
+        	
+        	$.ajax({
+        		url:'getname.action',
+        		type: "post",
+        		async: false,
+        		dataType: 'json',
+                success: function (data) {
+                	
+                	$("#PICname").val(data.pc_id);
+                	
+                	$("#userName").html(data.pc_name);
+                	
+                	
+                }
+        		
+        	})
+        }
+        function getMenu(){
+        	
+        	  $.ajax({
+        		type:"get",
+        		url:"/CRM/menu/getMenuTreeByRole.action",
+        		data:{
+        			user:$("#PICname").val()
+        		},
+        		async: false,
+        		contentType:"application/json;charset=utf-8",
+        		dataType:'json',
+        		
+        		
+        		success:function(data){
+        	       var str = '' ;
+        	       
+        	       str += '<nav class="navbar-default navbar-side" role="navigation"><div class="sidebar-collapse">';
+        	       str += '<ul class="nav" id="main-menu"><li id="addMenu">';
+        	       str += '<a href="index.html"><i class="fa fa-home"></i> 首页</a></li>';
+        	       
+        	       
+        			$.each(data,function(index,menuTree){
+        				str += '<li><a href="#"><i class="fa fa-sitemap"></i>'+menuTree.text+'<span class="fa arrow"></span></a>' ;
+        				str += '<ul class="nav nav-second-level">';
+        				$.each(menuTree.children,function(index,menu){
+            				str += '<li><a href="'+menu.url+'">'+menu.text+'</a></li>' ;
+            			})
+            			str += '</ul></li>';
+        			})
+        			
+        	
+        			
+        			str += '<li><a href="analysis.html"><i class="fa fa-bar-chart-o"></i> 统计分析</a>';
+        			str += '</li></ul></div></nav>';
+        			
+        			$('#addMenu').html(str);
+
+        		
+        			
+        		}
+        	});
+        }
+        function byebye(){
+    		$.ajax({
+    			url:'byebye.action',
+    			type:'post',
+    			success:function(data){
+    				location.reload();
+    			}
+    		})
+    	}
+    
+    </script>
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default top-navbar" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                    <a class="navbar-brand" href="index.html"><strong>CRM系统</strong></a>
+
+		<div id="sideNav" href=""><i class="fa fa-caret-right"></i></div>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-bell fa-fw"></i> 通知&nbsp;<i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a class="text-center" href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> 共有4条新消息
+
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">5 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">6 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">7 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">8 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>查看所有消息</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-user fa-fw"></i>
+                        <input type="hidden" id="PICname"  readonly/>
+                        <span id="userName"></span>
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#" data-toggle="modal" data-target="#information"><i class="fa fa-user fa-fw"></i> 个人信息</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> 个性化首页</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-toggle="modal" data-target="#out"><i class="fa fa-sign-out fa-fw"></i> 安全退出</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+        </nav>
+        <!--个人信息-->
+        <div class="modal fade" id="information" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="informationLabel">
+                            编辑信息
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">姓名：</span>
+                                <input type="text" class="form-control" placeholder="张三">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">邮箱：</span>
+                                <input type="text" class="form-control" placeholder="123456879@qq.com">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">部门：</span>
+                                <input type="text" class="form-control" placeholder="销售部门" disabled="disabled">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">职务：</span>
+                                <input type="text" class="form-control" placeholder="部门经理">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">性别：</span>
+                                <input type="radio" class="" value="0" name="sex">男
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="radio" class="" value="1" name="sex">女
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">头像：</span>
+                                <input type="file" class="form-control">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" name="save">
+                            保存
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+         <!--安全退出-->
+        <div class="modal fade" id="out" tabindex="-1" role="dialog" aria-labelledby="outLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="outLabel">
+                            确定要退出吗？
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        &nbsp;
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="byebye()">
+                            安全退出
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--/. NAV TOP  -->
+        <div id="addMenu"></div>
+        <!-- /. NAV SIDE  -->
+
+		<div id="page-wrapper">
+		  <div class="header">
+                        <h1 class="page-header">
+                            11111111  <small>负责人：李四</small>
+                        </h1>
+						<ol class="breadcrumb" >
+					        <li><a href="index.html">CRM系统</a></li>
+                            <li><a href="#">销售支持</a></li>
+					        <li><a href="reimbursement.html">费用报销</a></li>
+                            <li><a href="reimbursement-details.html">报销详情</a></li>
+					        <li class="active">11111111</li>
+					    </ol>
+		  </div>
+
+            <div id="page-inner">
+
+                <!-- /. ROW  -->
+
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#allClue" data-toggle="tab">
+                            基本信息
+                        </a>
+                    </li>
+
+                </ul>
+                <div id="myTabContent" class="tab-content breadcrumb" >
+                    <br>
+                    <!--基本信息 -->
+                    <div class="tab-pane fade in active text-left" id="allClue">
+                        <div class="row clearfix">
+                            <div class="col-md-6 column" >
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">基本信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%">费用编号：</td><td>1111111</td></tr>
+                                            <tr><td>费用类型：</td><td>通讯费</td></tr>
+                                            <tr><td>费用描述：</td><td>-------</td></tr>
+                                            <tr><td>费用金额：</td><td>¥ 1,280.00</td></tr>
+                                            <tr><td>发生时间：</td><td>-------</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">其它信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%">对应客户：</td><td>张三</td></tr>
+                                            <tr><td>联系人：</td><td>李四</td></tr>
+                                            <tr><td>机会/合同：</td><td>-------</td></tr>
+                                            <tr><td>跟进记录：</td><td>-------</td></tr>
+                                            <tr><td>拜访签到：</td><td>-------</td></tr>
+                                            <tr><td>报销状态：</td><td>已报销</td></tr>
+                                            <tr><td>对应报销单：</td><td>6451654</td></tr>
+                                            <tr><td>附件：</td><td>-------</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">系统信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%">创建人：</td><td>张三</td></tr>
+                                            <tr><td>创建时间：</td><td>2018-04-22 15:00</td></tr>
+                                            <tr><td>更新于：</td><td>2018-04-22 15:00</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+                <!-- /. ROW  -->
+
+				<footer>
+
+                    <br/><br/><br/>
+
+                    <p style="text-align: center">Copyright &copy; 2018.蓝桥中北二班第四组 All rights reserved.</p>
+
+
+				</footer>
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+        <!-- /. PAGE WRAPPER  -->
+    </div>
+    <!-- /. WRAPPER  -->
+    <!-- JS Scripts-->
+
+    <!-- Metis Menu Js -->
+    <script src="assets/js/jquery.metisMenu.js"></script>
+    <!-- Morris Chart Js -->
+    <script src="assets/js/morris/raphael-2.1.0.min.js"></script>
+    <script src="assets/js/morris/morris.js"></script>
+
+
+	<script src="assets/js/easypiechart.js"></script>
+	<script src="assets/js/easypiechart-data.js"></script>
+
+	 <script src="assets/js/Lightweight-Chart/jquery.chart.js"></script>
+	
+    <!-- Custom Js -->
+    <script src="assets/js/custom-scripts.js"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,808 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM系统-工作报告</title>
+    <script src="assets/js/jquery-1.10.2.js"></script>
+    <!-- Bootstrap Styles-->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FontAwesome Styles-->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+    <!-- Morris Chart Styles-->
+    <link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
+    <!-- Custom Styles-->
+    <link href="assets/css/custom-styles.css" rel="stylesheet" />
+    <!-- Google Fonts-->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="assets/js/Lightweight-Chart/cssCharts.css">
+    <!-- 时间-->
+    <link rel="stylesheet" type="text/css" media="all" href="assets/css/daterangepicker.css" />
+    <script type="text/javascript" src="assets/js/moment.js"></script>
+    <script type="text/javascript" src="assets/js/daterangepicker.js"></script>
+    <style type="text/css">
+    #msg{
+    height: 4rem;
+    text-align: center;
+    position: fixed;
+    top: 20%;
+    margin-top: -1rem;
+    line-height: 4rem;
+    width: 100%;
+    }
+    #msg span{
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    height: 4rem;
+    display: inline-block;
+    padding: 0 3rem;
+    border-radius: 5px;
+    }
+    </style>
+    
+
+    <script type="text/javascript">
+        $(function() {
+        	
+        	function alert(e){
+                $("body").append("<div id='msg'><span>"+e+"</span></div>");
+                clearmsg();
+            }
+            function clearmsg(){
+                var t = setTimeout(function(){
+                    $("#msg").remove();
+                },2000)
+            };
+            
+getName();
+        	
+        	getMenu();
+
+            <!-- 日期选择器配置-->
+            $('#birthdate').daterangepicker({
+                autoUpdateInput:true,
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker:true,
+                "locale": {
+                    "format": "MM/DD/YYYY h:mm A",
+                    "daysOfWeek": [
+                        "日",
+                        "一",
+                        "二",
+                        "三",
+                        "四",
+                        "五",
+                        "六"
+                    ],
+                    "monthNames": [
+                        "一月",
+                        "二月",
+                        "三月",
+                        "四月",
+                        "五月",
+                        "六月",
+                        "七月",
+                        "八月",
+                        "九月",
+                        "十月",
+                        "十一月",
+                        "十二月"
+                    ],
+                    "applyLabel": "确定",
+                    "cancelLabel": "取消"
+                }
+            });
+
+            <!-- 保存按钮点击事件-->
+            $("button[name='save']").click(function(){
+                alert("保存成功");
+                location.reload();
+            });
+        });
+function getName(){
+        	
+        	$.ajax({
+        		url:'getname.action',
+        		type: "post",
+        		async: false,
+        		dataType: 'json',
+                success: function (data) {
+                	
+                	$("#PICname").val(data.pc_id);
+                	
+                	$("#userName").html(data.pc_name);
+                	
+                	
+                }
+        		
+        	})
+        }
+        function getMenu(){
+        	
+        	  $.ajax({
+        		type:"get",
+        		url:"/CRM/menu/getMenuTreeByRole.action",
+        		data:{
+        			user:$("#PICname").val()
+        		},
+        		async: false,
+        		contentType:"application/json;charset=utf-8",
+        		dataType:'json',
+        		
+        		
+        		success:function(data){
+        	       var str = '' ;
+        	       
+        	       str += '<nav class="navbar-default navbar-side" role="navigation"><div class="sidebar-collapse">';
+        	       str += '<ul class="nav" id="main-menu"><li id="addMenu">';
+        	       str += '<a href="index.html"><i class="fa fa-home"></i> 首页</a></li>';
+        	       
+        	       
+        			$.each(data,function(index,menuTree){
+        				str += '<li><a href="#"><i class="fa fa-sitemap"></i>'+menuTree.text+'<span class="fa arrow"></span></a>' ;
+        				str += '<ul class="nav nav-second-level">';
+        				$.each(menuTree.children,function(index,menu){
+            				str += '<li><a href="'+menu.url+'">'+menu.text+'</a></li>' ;
+            			})
+            			str += '</ul></li>';
+        			})
+        			
+        	
+        			
+        			str += '<li><a href="analysis.html"><i class="fa fa-bar-chart-o"></i> 统计分析</a>';
+        			str += '</li></ul></div></nav>';
+        			
+        			$('#addMenu').html(str);
+
+        		
+        			
+        		}
+        	});
+        }
+        function byebye(){
+    		$.ajax({
+    			url:'byebye.action',
+    			type:'post',
+    			success:function(data){
+    				location.reload();
+    			}
+    		})
+    	}
+
+    </script>
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default top-navbar" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                    <a class="navbar-brand" href="index.html"><strong>CRM系统</strong></a>
+
+		<div id="sideNav" href=""><i class="fa fa-caret-right"></i></div>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-bell fa-fw"></i> 通知&nbsp;<i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a class="text-center" href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> 共有4条新消息
+
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">5 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">6 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">7 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">8 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>查看所有消息</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-user fa-fw"></i>
+                        <input type="hidden" id="PICname"  readonly/>
+                        <span id="userName"></span>
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#" data-toggle="modal" data-target="#information"><i class="fa fa-user fa-fw"></i> 个人信息</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> 个性化首页</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-toggle="modal" data-target="#out"><i class="fa fa-sign-out fa-fw"></i> 安全退出</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+        </nav>
+        <!--个人信息-->
+        <div class="modal fade" id="information" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="informationLabel">
+                            编辑信息
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">姓名：</span>
+                                <input type="text" class="form-control" placeholder="张三">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">邮箱：</span>
+                                <input type="text" class="form-control" placeholder="123456879@qq.com">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">部门：</span>
+                                <input type="text" class="form-control" placeholder="销售部门" disabled="disabled">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">职务：</span>
+                                <input type="text" class="form-control" placeholder="部门经理">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">性别：</span>
+                                <input type="radio" class="" value="0" name="sex">男
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="radio" class="" value="1" name="sex">女
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">头像：</span>
+                                <input type="file" class="form-control">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" name="save">
+                            保存
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--新增工作报告-->
+        <div class="modal fade" id="addClue" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="addClueLabel">
+                            编辑工作报告
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center pre-scrollable">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">报告类型：</span>
+                                <select class="form-control">
+                                    <option>选择报告类型</option>
+                                    <option>日报</option>
+                                    <option>周报</option>
+                                    <option>月报</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">新建日期：</span>
+                                <input type="text" class="form-control" id="birthdate" value=""  />
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">批阅人：&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <select class="form-control">
+                                    <option>请选择用户</option>
+                                    <option>张三</option>
+                                    <option>李四</option>
+                                    <option>其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">抄送人：&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="text" class="form-control" placeholder="">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">今日总结：</span>
+                                <textarea class="form-control" rows="4"></textarea>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">明日计划：</span>
+                                <textarea class="form-control" rows="4"></textarea>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">上传图片：</span>
+                                <input type="file" class="form-control" placeholder="">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">上传附件：</span>
+                                <input type="file" class="form-control" placeholder="">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" name="save">
+                            保存
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--安全退出-->
+        <div class="modal fade" id="out" tabindex="-1" role="dialog" aria-labelledby="outLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="outLabel">
+                            确定要退出吗？
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        &nbsp;
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="byebye()">
+                            安全退出
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--/. NAV TOP  -->
+        <div id="addMenu"></div>
+        <!-- /. NAV SIDE  -->
+
+		<div id="page-wrapper">
+		  <div class="header">
+                        <h1 class="page-header">
+                            销售支持 <small>工作报告</small>
+                        </h1>
+						<ol class="breadcrumb" >
+					  <li><a href="index.html">CRM系统</a></li>
+					  <li><a href="#">销售支持</a></li>
+					  <li class="active">工作报告</li>
+					</ol>
+
+          </div>
+            <div>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addClue" style="float: right;margin-right: 40px">
+                    <i class="fa fa-folder fa-fw"></i>新建工作报告
+                </button>
+            </div>
+            <div id="page-inner" class="container">
+
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#allClue" data-toggle="tab">
+                            提交给我的报告
+                        </a>
+                    </li>
+                    <li><a href="#myClue" data-toggle="tab">我提交的报告</a></li>
+                    <li><a href="#customer" data-toggle="tab">我下属的报告</a></li>
+                </ul>
+                <div id="myTabContent" class="tab-content breadcrumb" >
+                    <br>
+                    <!-- 提交给我的报告-->
+                    <div class="tab-pane fade in active text-left" id="allClue">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告类型：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="日报">
+                                <input type="button" class="btn btn-default" value="周报">
+                                <input type="button" class="btn btn-default" value="月报">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告状态：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="全部">
+                                <input type="button" class="btn btn-default" value="已批阅">
+                                <input type="button" class="btn btn-default" value="未批阅">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <div style="float: left">
+                                <span>提交人：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;</span></div>
+                                <select class="btn btn-default" style="float: left">
+                                    <option>请选择用户</option>
+                                    <option>张三</option>
+                                    <option>李四</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <div style="float: left">
+                                <span>所属部门：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+                                <select class="btn btn-default" style="float: left">
+                                    <option>请选择所属部门</option>
+                                    <option>销售部</option>
+                                    <option>营销部</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 我提交的报告-->
+                    <div class="tab-pane fade" id="myClue">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告类型：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="日报">
+                                <input type="button" class="btn btn-default" value="周报">
+                                <input type="button" class="btn btn-default" value="月报">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告状态：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="全部">
+                                <input type="button" class="btn btn-default" value="已批阅">
+                                <input type="button" class="btn btn-default" value="未批阅">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 我下属的报告-->
+                    <div class="tab-pane fade" id="customer">
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告类型：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="日报">
+                                <input type="button" class="btn btn-default" value="周报">
+                                <input type="button" class="btn btn-default" value="月报">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <span>报告状态：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <input type="button" class="btn btn-default" value="全部">
+                                <input type="button" class="btn btn-default" value="已批阅">
+                                <input type="button" class="btn btn-default" value="未批阅">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <div style="float: left">
+                                <span>提交人：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    &nbsp;&nbsp;&nbsp;</span></div>
+                                <select class="btn btn-default" style="float: left">
+                                    <option>请选择用户</option>
+                                    <option>张三</option>
+                                    <option>李四</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="btn-toolbar" role="toolbar">
+                            <div class="panel-body">
+                                <div style="float: left">
+                                    <span>所属部门：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></div>
+                                <select class="btn btn-default" style="float: left">
+                                    <option>请选择所属部门</option>
+                                    <option>销售部</option>
+                                    <option>营销部</option>
+                                    <option>其他</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row clearfix">
+                    <div class="col-md-2 column">
+                        <br/><br/>
+                        <div class="panel panel-default">
+                            <div class="panel-footer">
+                                <h3 class="panel-title">
+                                    2018年4月17日
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="cursor: pointer">
+                                张三的日报
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-footer">
+                                <h3 class="panel-title">
+                                    2018年4月17日
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="cursor: pointer">
+                                张三的日报
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-footer">
+                                <h3 class="panel-title">
+                                    2018年4月17日
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="cursor: pointer">
+                                张三的日报
+                            </div>
+                        </div>
+                        <div class="panel panel-default">
+                            <div class="panel-footer">
+                                <h3 class="panel-title">
+                                    2018年4月17日
+                                </h3>
+                            </div>
+                            <div class="panel-body" style="cursor: pointer">
+                                张三的日报
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10 column">
+                        <br/>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="border-bottom: double">
+                                <button type="button" class="btn btn-default" style="float: right" >
+                                    <i class="fa fa-share fa-fw"></i>
+                                    &nbsp;&nbsp;删除&nbsp;&nbsp;
+                                </button>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addClue" style="float: right" >
+                                    <i class="fa fa-pencil fa-fw"></i>
+                                    &nbsp;&nbsp;编辑&nbsp;&nbsp;
+                                </button>
+                                <h2>
+                                    张三的日报（2018年4月17日）
+                                </h2><br/>
+                                <small>批阅人：李晓燕 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    抄送：李晓燕 <span style="float: right">提交时间：2018-04-17 17:38</span></small>
+                            </div>
+                            <div class="panel-body">
+                                <h4>
+                                    <span class="label label-primary">
+                                        <span class="glyphicon glyphicon-asterisk"></span>&nbsp;&nbsp;
+                                        新建线索&nbsp;&nbsp;3</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-success">
+                                        <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;
+                                        新建客户&nbsp;&nbsp; 5</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-info">
+                                        <span class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;
+                                        新建机会&nbsp;&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-warning">
+                                        <span class="glyphicon glyphicon-heart"></span>&nbsp;&nbsp;
+                                        跟进次数&nbsp;&nbsp;5</span>
+                                </h4>
+                                <br/>
+                                <div>
+                                    <h3>今日总结</h3>
+                                    <h4>二个人个人 沃尔夫外文同人文</h4>
+                                    <br/>
+                                    <h3>今日总结</h3>
+                                    <h4>尔尕而过额如果serger而是</h4>
+                                </div>
+
+
+                            </div>
+                            <div class="panel-footer">
+
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="border-bottom: double">
+                                <button type="button" class="btn btn-default" style="float: right" >
+                                    <i class="fa fa-share fa-fw"></i>
+                                    &nbsp;&nbsp;删除&nbsp;&nbsp;
+                                </button>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addClue" style="float: right" >
+                                    <i class="fa fa-pencil fa-fw"></i>
+                                    &nbsp;&nbsp;编辑&nbsp;&nbsp;
+                                </button>
+                                <h2>
+                                    张三的日报（2018年4月17日）
+                                </h2><br/>
+                                <small>批阅人：李晓燕 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    抄送：李晓燕 <span style="float: right">提交时间：2018-04-17 17:38</span></small>
+                            </div>
+                            <div class="panel-body">
+                                <h4>
+                                    <span class="label label-primary">
+                                        <span class="glyphicon glyphicon-asterisk"></span>&nbsp;&nbsp;
+                                        新建线索&nbsp;&nbsp;3</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-success">
+                                        <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;
+                                        新建客户&nbsp;&nbsp; 5</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-info">
+                                        <span class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;
+                                        新建机会&nbsp;&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-warning">
+                                        <span class="glyphicon glyphicon-heart"></span>&nbsp;&nbsp;
+                                        跟进次数&nbsp;&nbsp;5</span>
+                                </h4>
+                                <br/>
+                                <div>
+                                    <h3>今日总结</h3>
+                                    <h4>二个人个人 沃尔夫外文同人文</h4>
+                                    <br/>
+                                    <h3>今日总结</h3>
+                                    <h4>尔尕而过额如果serger而是</h4>
+                                </div>
+
+
+                            </div>
+                            <div class="panel-footer">
+
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="border-bottom: double">
+                                <button type="button" class="btn btn-default" style="float: right" >
+                                    <i class="fa fa-share fa-fw"></i>
+                                    &nbsp;&nbsp;删除&nbsp;&nbsp;
+                                </button>
+                                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addClue" style="float: right" >
+                                    <i class="fa fa-pencil fa-fw"></i>
+                                    &nbsp;&nbsp;编辑&nbsp;&nbsp;
+                                </button>
+                                <h2>
+                                    张三的日报（2018年4月17日）
+                                </h2><br/>
+                                <small>批阅人：李晓燕 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    抄送：李晓燕 <span style="float: right">提交时间：2018-04-17 17:38</span></small>
+                            </div>
+                            <div class="panel-body">
+                                <h4>
+                                    <span class="label label-primary">
+                                        <span class="glyphicon glyphicon-asterisk"></span>&nbsp;&nbsp;
+                                        新建线索&nbsp;&nbsp;3</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-success">
+                                        <span class="glyphicon glyphicon-user"></span>&nbsp;&nbsp;
+                                        新建客户&nbsp;&nbsp; 5</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-info">
+                                        <span class="glyphicon glyphicon-star"></span>&nbsp;&nbsp;
+                                        新建机会&nbsp;&nbsp;6</span>&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <span class="label label-warning">
+                                        <span class="glyphicon glyphicon-heart"></span>&nbsp;&nbsp;
+                                        跟进次数&nbsp;&nbsp;5</span>
+                                </h4>
+                                <br/>
+                                <div>
+                                    <h3>今日总结</h3>
+                                    <h4>二个人个人 沃尔夫外文同人文</h4>
+                                    <br/>
+                                    <h3>今日总结</h3>
+                                    <h4>尔尕而过额如果serger而是</h4>
+                                </div>
+
+
+                            </div>
+                            <div class="panel-footer">
+
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+				<footer>
+
+                    <br/><br/><br/>
+
+                    <p style="text-align: center">Copyright &copy; 2018.蓝桥中北二班第四组 All rights reserved.</p>
+
+
+				</footer>
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+        <!-- /. PAGE WRAPPER  -->
+    </div>
+    <!-- /. WRAPPER  -->
+    <!-- JS Scripts-->
+
+    <!-- Metis Menu Js -->
+    <script src="assets/js/jquery.metisMenu.js"></script>
+    <!-- Morris Chart Js -->
+    <script src="assets/js/morris/raphael-2.1.0.min.js"></script>
+    <script src="assets/js/morris/morris.js"></script>
+
+
+	<script src="assets/js/easypiechart.js"></script>
+	<script src="assets/js/easypiechart-data.js"></script>
+
+	 <script src="assets/js/Lightweight-Chart/jquery.chart.js"></script>
+	
+    <!-- Custom Js -->
+    <script src="assets/js/custom-scripts.js"></script>
+
+
+</body>
+
+</html>

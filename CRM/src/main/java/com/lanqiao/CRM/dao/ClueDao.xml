@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanqiao.CRM.dao.ClueDao">    
+
+    <select  id="findAll" resultType="clue">
+           select * from clue
+    </select>
+    
+    <select  id="getTotalBySome" parameterType="clue" resultType="int">
+           select count(*) from clue
+           <where>
+           <if test="xstatus!=null and xstatus!=''">
+               and xstatus=#{xstatus} 
+           </if>
+           <if test="xarea!=null and xarea!=''">
+               and xarea=#{xarea} 
+           </if>
+           <if test="xactual!=null and xactual!=''">
+               and ${xactual} 
+           </if>
+           <if test="xnext!=null and xnext!=''">
+               and ${xnext} 
+           </if>
+           <if test="xsource!=null and xsource!=''">
+               and xsource=#{xsource} 
+           </if>
+           <if test="xname!=null and xname!=''">
+               and xname=#{xname} 
+           </if>
+           <if test="xcomname!=null and xcomname!=''">
+               and xcomname=#{xcomname} 
+           </if>
+           </where>
+    </select>
+    
+    <select  id="findBySome" parameterType="map" resultType="clue">
+           select * from clue
+           <where>
+           <if test="clue.xstatus!=null and clue.xstatus!=''">
+               and xstatus=#{clue.xstatus} 
+           </if>
+           <if test="clue.xarea!=null and clue.xarea!=''">
+               and xarea=#{clue.xarea} 
+           </if>
+           <if test="clue.xactual!=null and clue.xactual!=''">
+               and ${clue.xactual} 
+           </if>
+           <if test="clue.xnext!=null and clue.xnext!=''">
+               and ${clue.xnext} 
+           </if>
+           <if test="clue.xsource!=null and clue.xsource!=''">
+               and xsource=#{clue.xsource} 
+           </if>
+           <if test="clue.xname!=null and clue.xname!=''">
+               and xname=#{clue.xname} 
+           </if>
+           <if test="clue.xcomname!=null and clue.xcomname!=''">
+               and xcomname=#{clue.xcomname} 
+           </if>
+           </where>
+           limit #{start},#{end}
+    </select>
+    
+    <select id="findById" parameterType="int" resultType="clue" >
+             select * from clue where xid=#{xid}
+    </select>
+  
+   <select id="findByXName" parameterType="String" resultType="clue">
+           select * from clue where xname=#{xname}
+   </select>
+  
+    <select id="findByXFid" parameterType="map" resultType="clue">
+         select *from (select * from clue where xfid=#{xfid}) aa limit #{start},#{end}
+     </select>
+   
+   
+     <select id="getPage" parameterType="map" resultType="clue">
+         select *from clue limit #{start},#{end}
+     </select>
+     
+     <select id="getTotal" resultType="int">
+		 select count(*) from clue
+	</select>
+	
+	 <select id="getTotalByXfid"  parameterType="String" resultType="int">
+		 select count(*) from clue  where xfid=#{xfid}
+	</select>
+	
+	<insert id="insert" parameterType="clue" >
+	    insert into clue values(#{xactual},null,#{xname},#{xcomname},#{xdeptno},#{xjob},#{xphone},#{xemail},#{xarea},#{xzip},#{xstatus},#{xsource},#{xnext},#{xremark},#{xfid})
+	</insert>
+	
+	<delete id="deleteByArray"  parameterType="int[]">
+           delete from clue where xid in            <!-- collection 后面跟array --> 
+     <foreach collection="array" open="(" item="xid" separator="," close=")">#{xid}</foreach>
+    </delete>
+	
+	
+	<update id="update" parameterType="clue">
+	    update clue set xname=#{xname},
+	                    xcomname=#{xcomname},
+	                    xdeptno=#{xdeptno},
+	                    xjob=#{xjob},
+	                    xphone=#{xphone},
+	                    xemail=#{xemail},
+	                    xarea=#{xarea},
+	                    xzip=#{xzip},
+	                    xstatus=#{xstatus},
+	                    xsource=#{xsource},
+	                    xnext=#{xnext},
+	                    xremark=#{xremark},
+	                    xfid=#{xfid},
+	                    xactual=#{xactual}
+	                    where xid=#{xid}
+	</update>
+	
+	
+	<select id="findById2"  parameterType="int" resultType="area">
+	         select * from area where id=#{id}
+	</select>
+	
+ </mapper>

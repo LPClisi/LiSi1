@@ -1,0 +1,787 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRM系统-回款详情</title>
+    <script src="assets/js/jquery-1.10.2.js"></script>
+    <!-- Bootstrap Styles-->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <link href="assets/css/bootstrap.css" rel="stylesheet" />
+    <!-- FontAwesome Styles-->
+    <link href="assets/css/font-awesome.css" rel="stylesheet" />
+    <!-- Morris Chart Styles-->
+    <link href="assets/js/morris/morris-0.4.3.min.css" rel="stylesheet" />
+    <!-- Custom Styles-->
+    <link href="assets/css/custom-styles.css" rel="stylesheet" />
+    <!-- Google Fonts-->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+    <link rel="stylesheet" href="assets/js/Lightweight-Chart/cssCharts.css">
+    <!-- 地区-->
+    <link rel="stylesheet" type="text/css" href="assets/css/cityPicker.css">
+    <script type="text/javascript" src="assets/js/cityData.js"></script>
+    <script type="text/javascript" src="assets/js/cityPicker.js"></script>
+    <!-- 时间-->
+    <link rel="stylesheet" type="text/css" media="all" href="assets/css/daterangepicker.css" />
+    <script type="text/javascript" src="assets/js/moment.js"></script>
+    <script type="text/javascript" src="assets/js/daterangepicker.js"></script>
+    <style type="text/css">
+    #msg{
+    height: 4rem;
+    text-align: center;
+    position: fixed;
+    top: 20%;
+    margin-top: -1rem;
+    line-height: 4rem;
+    width: 100%;
+    }
+    #msg span{
+    color: #fff;
+    background: rgba(0,0,0,0.6);
+    height: 4rem;
+    display: inline-block;
+    padding: 0 3rem;
+    border-radius: 5px;
+    }
+    </style>
+    
+    <script type="text/javascript">
+        $(function() {
+        	
+        	function alert(e){
+                $("body").append("<div id='msg'><span>"+e+"</span></div>");
+                clearmsg();
+            }
+            function clearmsg(){
+                var t = setTimeout(function(){
+                    $("#msg").remove();
+                },2000)
+            };
+        	var url=window.location.href;
+        	var c=url.split("?")[1];
+        	var cid=c.split("=")[1];
+getName();
+        	
+        	getMenu();
+        	//显示信息
+        	$.ajax({
+        	   type:"get",
+  			   url:"/CRM/payment/findById.action",
+  			   data:{id:cid},
+  		       datatype:'json',
+		           contentType:"application/json;charset=utf-8",
+		           success:function(data){
+		        	   if((data[1].contractcost-data[2])>0){
+		        		      $("#huikuanstatus").html("未完成");
+		        		      
+		        	            }else{
+		        		         $("#huikuanstatus").html("完成");
+		        		        
+		        	          };
+		        	  $("#paydate").html(data[0].paydate);
+		        	  $("#paymoney").html("￥"+data[0].paymoney);
+		        	  $("#payperiod").html(data[0].payperiod);
+		        	  $("#customer").html(data[0].customer);
+		        	  $("#remark").html(data[0].remark);  huikuanstatus
+		        	  $("#contract").html(data[0].contract);
+		        	  $("#biaoti1").html(data[0].contract+data[0].payperiod+"还款计划"),
+		        	  $("#biaoti2").html(data[0].contract+data[0].payperiod+"还款计划"),
+		        	  $("#yihuikuan").html("￥"+data[2]),
+		        	  $("#weihuikuan").html("￥"+(data[1].contractcost-data[2]))
+		        	  
+		        	  
+		              }
+        	});
+            //保存回款记录
+        	$("#savePayRecord").click(function(){
+       	    	
+       		  $.ajax({
+          		   type:'get',
+          		   url:"/CRM/payment/savePayRecord.action",
+                     data:{
+                  	customer:$("#customer2").val(),
+                  	contract:$("#contract2").val(),
+                  	paydate:$("#paydate2").val(),
+                  	paymoney:$("#paymoney2").val(),
+                  	payperiod:$("#payperiod2").val(),
+                  	paymethod:$("#paymethod2").val(),
+                  	paytype:$("#paytype2").val(),
+                  	payee:$("#payee2").val(),
+                  	remark:$("#remark2").val()
+                  },      		   
+          		   datatype:'json',
+          		   contentType:"application/json;charset=utf-8",
+          		   success:function(data){
+          			    alert(data);
+                          
+                          	 document.reload();
+                          
+          		   }
+          	   })
+       	  });
+        	
+		        	  <!-- 日期选择器配置-->
+            $('input[name="birthdate"]').daterangepicker({
+                autoUpdateInput:true,
+                singleDatePicker: true,
+                showDropdowns: true,
+                timePicker:true,
+                "locale": {
+                    "format": "YYYY/MM/DD",
+                    "daysOfWeek": [
+                        "日",
+                        "一",
+                        "二",
+                        "三",
+                        "四",
+                        "五",
+                        "六"
+                    ],
+                    "monthNames": [
+                        "一月",
+                        "二月",
+                        "三月",
+                        "四月",
+                        "五月",
+                        "六月",
+                        "七月",
+                        "八月",
+                        "九月",
+                        "十月",
+                        "十一月",
+                        "十二月"
+                    ],
+                    "applyLabel": "确定",
+                    "cancelLabel": "取消"
+                }
+            });
+            $('input[name="daterange"]').daterangepicker({
+                alwaysShowCalendar:true,
+                "locale": {
+                    "format": "YYYY/MM/DD",
+                    "daysOfWeek": [
+                        "日",
+                        "一",
+                        "二",
+                        "三",
+                        "四",
+                        "五",
+                        "六"
+                    ],
+                    "monthNames": [
+                        "一月",
+                        "二月",
+                        "三月",
+                        "四月",
+                        "五月",
+                        "六月",
+                        "七月",
+                        "八月",
+                        "九月",
+                        "十月",
+                        "十一月",
+                        "十二月"
+                    ],
+                    "applyLabel": "确定",
+                    "cancelLabel": "取消"
+                }
+            });
+            <!-- 保存按钮点击事件-->
+            $("button[name='save']").click(function(){
+                alert("保存成功");
+                location.reload();
+            });
+        });
+function getName(){
+        	
+        	$.ajax({
+        		url:'getname.action',
+        		type: "post",
+        		async: false,
+        		dataType: 'json',
+                success: function (data) {
+                	
+                	$("#PICname").val(data.pc_id);
+                	
+                	$("#userName").html(data.pc_name);
+                	
+                	
+                }
+        		
+        	})
+        }
+        function getMenu(){
+        	
+        	  $.ajax({
+        		type:"get",
+        		url:"/CRM/menu/getMenuTreeByRole.action",
+        		data:{
+        			user:$("#PICname").val()
+        		},
+        		async: false,
+        		contentType:"application/json;charset=utf-8",
+        		dataType:'json',
+        		
+        		
+        		success:function(data){
+        	       var str = '' ;
+        	       
+        	       str += '<nav class="navbar-default navbar-side" role="navigation"><div class="sidebar-collapse">';
+        	       str += '<ul class="nav" id="main-menu"><li id="addMenu">';
+        	       str += '<a href="index.html"><i class="fa fa-home"></i> 首页</a></li>';
+        	       
+        	       
+        			$.each(data,function(index,menuTree){
+        				str += '<li><a href="#"><i class="fa fa-sitemap"></i>'+menuTree.text+'<span class="fa arrow"></span></a>' ;
+        				str += '<ul class="nav nav-second-level">';
+        				$.each(menuTree.children,function(index,menu){
+            				str += '<li><a href="'+menu.url+'">'+menu.text+'</a></li>' ;
+            			})
+            			str += '</ul></li>';
+        			})
+        			
+        	
+        			
+        			str += '<li><a href="analysis.html"><i class="fa fa-bar-chart-o"></i> 统计分析</a>';
+        			str += '</li></ul></div></nav>';
+        			
+        			$('#addMenu').html(str);
+
+        		
+        			
+        		}
+        	});
+        }
+        function byebye(){
+    		$.ajax({
+    			url:'byebye.action',
+    			type:'post',
+    			success:function(data){
+    				location.reload();
+    			}
+    		})
+    	}
+
+    </script>
+
+</head>
+
+<body>
+    <div id="wrapper">
+        <nav class="navbar navbar-default top-navbar" role="navigation">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".sidebar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                    <a class="navbar-brand" href="index.html"><strong>CRM系统</strong></a>
+
+		<div id="sideNav" href=""><i class="fa fa-caret-right"></i></div>
+            </div>
+
+            <ul class="nav navbar-top-links navbar-right">
+
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-bell fa-fw"></i> 通知&nbsp;<i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <li>
+                            <a class="text-center" href="#">
+                                <div>
+                                    <i class="fa fa-tasks fa-fw"></i> 共有4条新消息
+
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">5 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">6 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">7 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-comment fa-fw"></i> 新消息
+                                    <span class="pull-right text-muted small">8 min 前</span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a class="text-center" href="#">
+                                <strong>查看所有消息</strong>
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-alerts -->
+                </li>
+                <!-- /.dropdown -->
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+                        <i class="fa fa-user fa-fw"></i>
+                        <input type="hidden" id="PICname"  readonly/>
+                        <span id="userName"></span>
+                        <i class="fa fa-caret-down"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#" data-toggle="modal" data-target="#information"><i class="fa fa-user fa-fw"></i> 个人信息</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#"><i class="fa fa-gear fa-fw"></i> 个性化首页</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li><a href="#" data-toggle="modal" data-target="#out"><i class="fa fa-sign-out fa-fw"></i> 安全退出</a>
+                        </li>
+                    </ul>
+                    <!-- /.dropdown-user -->
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+        </nav>
+        <!--个人信息-->
+        <div class="modal fade" id="information" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="informationLabel">
+                            编辑信息
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">姓名：</span>
+                                <input type="text" class="form-control" placeholder="张三">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">邮箱：</span>
+                                <input type="text" class="form-control" placeholder="123456879@qq.com">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">部门：</span>
+                                <input type="text" class="form-control" placeholder="销售部门" disabled="disabled">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">职务：</span>
+                                <input type="text" class="form-control" placeholder="部门经理">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">性别：</span>
+                                <input type="radio" class="" value="0" name="sex">男
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <input type="radio" class="" value="1" name="sex">女
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">头像：</span>
+                                <input type="file" class="form-control">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" name="save">
+                            保存
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--新增回款计划-->
+        <div class="modal fade" id="payment-plan" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            新增回款计划
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">对应客户：</span>
+                                <select class="form-control">
+                                    <option>请选择客户</option>
+                                    <option>张三</option>
+                                    <option>李四</option>
+                                    <option>其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">对应合同：</span>
+                                <select class="form-control">
+                                    <option>请选择合同</option>
+                                    <option>合同1</option>
+                                    <option>合同2</option>
+                                    <option>其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">合同金额：</span>
+                                <input type="text" class="form-control" placeholder="9999999" disabled="disabled">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">签约日期：</span>
+                                <input type="text" class="form-control" placeholder="04/13/2018" disabled="disabled">
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" name="save">
+                            保存
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--新增回款记录-->
+        <div class="modal fade" id="payment-record" tabindex="-1" role="dialog" aria-labelledby="informationLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title">
+                            新增回款记录
+                        </h4>
+                    </div>
+                    <div class="modal-body text-center pre-scrollable">
+
+                        <form class="bs-example bs-example-form" role="form">
+                            <div class="input-group">
+                                <span class="input-group-addon">回款日期：</span>
+                                <input type="text" class="form-control" name="birthdate" value=""  id="paydate2"/>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">回款金额：</span>
+                                <input type="text" class="form-control" placeholder="" id="paymoney2">
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">对应客户：</span>
+                                <select class="form-control" id="customer2">
+                                    <option value="请选择客户">请选择客户</option>
+                                    <option value="张三">张三</option>
+                                    <option value="李四">李四</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">合同名称：</span>
+                                <select class="form-control" id="contract2">
+                                    <option value="请选择合同">请选择合同</option>
+                                    <option value="合同1">合同1</option>
+                                    <option value="合同2">合同2</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">回款期次：</span>
+                                <select class="form-control" id="payperiod2">
+                                    <option value="请选择期次">请选择期次</option>
+                                    <option value="第一期">第一期</option>
+                                    <option value="第二期">第二期</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">付款方式：</span>
+                                <select class="form-control" id="paymethod2">
+                                    <option value="请选择付款方式">请选择付款方式</option>
+                                    <option value="支票">支票</option>
+                                    <option value="现金">现金</option>
+                                    <option value="银行转账">银行转账</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">回款类型：</span>
+                                <select class="form-control" id="paytype2">
+                                    <option value="请选择回款类型">请选择回款类型</option>
+                                    <option value="正常回款">正常回款</option>
+                                    <option value="退款">退款</option>
+                                    <option value="保证金">保证金</option>
+                                    <option value="预收款">预收款</option>
+                                    <option value="尾款">尾款</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">收款人：&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <select class="form-control" id="payee2">
+                                    <option value="选择收款人">选择收款人</option>
+                                    <option value="张三">张三</option>
+                                    <option value="李四">李四</option>
+                                    <option value="其它">其它</option>
+                                </select>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon">备注：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                                <textarea class="form-control" rows="4" id="remark2"></textarea>
+                            </div>
+                        </form>
+
+                    </div>
+                    <div class="modal-footer">
+
+                        <button type="button" class="btn btn-primary" id="savePayRecord">
+                            保存
+                        </button>
+                     </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--安全退出-->
+        <div class="modal fade" id="out" tabindex="-1" role="dialog" aria-labelledby="outLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="outLabel">
+                            确定要退出吗？
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        &nbsp;
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary" onclick="byebye()">
+                            安全退出
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+        <!--/. NAV TOP  -->
+        <div id="addMenu"></div>
+        <!-- /. NAV SIDE  -->
+
+		<div id="page-wrapper">
+		  <div class="header">
+                        <h1 class="page-header" id="biaoti1">
+                                                                                                          【业支】维所--亚拉拉特 第1期回款计划
+                        </h1>
+						<ol class="breadcrumb" >
+					        <li><a href="index.html">CRM系统</a></li>
+                            <li><a href="#">销售管理</a></li>
+					        <li><a href="payment.html">回款</a></li>
+					        <li class="active" id="biaoti2">【业支】维所--亚拉拉特 第1期回款计划</li>
+					    </ol>
+
+		  </div>
+            <div class="btn-toolbar" role="toolbar">
+                <div class="panel-body">
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#payment-plan">
+                        <i class="glyphicon glyphicon-plus"></i>配置
+                    </button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#payment-record">
+                        <i class="fa fa-folder fa-fw"></i>新建回款记录
+                    </button>
+                </div>
+            </div>
+            <div id="page-inner">
+
+                <!-- /. ROW  -->
+
+                <ul id="myTab" class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#khzl" data-toggle="tab">
+                            客户全景
+                        </a>
+                    </li>
+                </ul>
+                <div id="myTabContent" class="tab-content breadcrumb" >
+                    <br>
+                    <!-- 基本信息  -->
+                    <div class="tab-pane fade in active text-left" id="khzl">
+                        <div class="row clearfix">
+                            <div class="col-md-6 column" >
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">基本信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%">计划回款日期：</td><td id="paydate">2018-04-09</td></tr>
+                                            <tr><td>计划回款金额：</td><td id="paymoney">¥ 19,164.75</td></tr>
+                                            <tr><td>回款期次：</td><td id="payperiod"> 1</td></tr>
+                                            <tr><td>合同名称：</td><td id="contract">【业支】维所--亚拉拉特</td></tr>
+                                            <tr><td>对应客户：</td><td id="customer">维拉斯会所</td></tr>
+                                            <tr><td>备注：</td><td id="remark"></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">其它信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%" >回款状态：</td><td id="huikuanstatus"></td></tr>
+                                            
+                                            <tr><td>已回款金额：</td><td id="yihuikuan"></td></tr>
+                                            <tr><td>未回款金额：</td><td id="weihuikuan"></td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="panel panel-info">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">系统信息</h3>
+                                    </div>
+                                    <div class="panel-body table-responsive">
+                                        <table class="table">
+                                            <tr><td width="20%">创建时间：</td><td>2018-04-09 17:58</td></tr>
+                                            <tr><td>更新于：</td><td>2018-04-09 17:58</td></tr>
+                                            <tr><td>创建人：</td><td>李四</td></tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- /. ROW  -->
+
+				<footer>
+
+                    <br/><br/><br/>
+
+                    <p style="text-align: center">Copyright &copy; 2018.蓝桥中北二班第四组 All rights reserved.</p>
+
+
+				</footer>
+            </div>
+            <!-- /. PAGE INNER  -->
+        </div>
+        <!-- /. PAGE WRAPPER  -->
+    </div>
+    <!-- /. WRAPPER  -->
+    <!-- JS Scripts-->
+
+    <!-- Metis Menu Js -->
+    <script src="assets/js/jquery.metisMenu.js"></script>
+    <!-- Morris Chart Js -->
+    <script src="assets/js/morris/raphael-2.1.0.min.js"></script>
+    <script src="assets/js/morris/morris.js"></script>
+
+
+	<script src="assets/js/easypiechart.js"></script>
+	<script src="assets/js/easypiechart-data.js"></script>
+
+	 <script src="assets/js/Lightweight-Chart/jquery.chart.js"></script>
+	
+    <!-- Custom Js -->
+    <script src="assets/js/custom-scripts.js"></script>
+
+
+
+
+    <script>
+        var cityPicker = new IIInsomniaCityPicker({
+            data: cityData,
+            target: '#cityChoice',
+            valType: 'k-v',
+            hideCityInput: '#city',
+            hideProvinceInput: '#province',
+            callback: function(city_id){
+                $('#cityChoice').html(city_id);
+            }
+        });
+
+        cityPicker.init();
+    </script>
+    <script>
+        var cityPicker = new IIInsomniaCityPicker({
+            data: cityData,
+            target: '#cityChoice2',
+            valType: 'k-v',
+            hideCityInput: '#city2',
+            hideProvinceInput: '#province2',
+            callback: function(city_id){
+                $('#cityChoice2').html(city_id);
+            }
+        });
+
+        cityPicker.init();
+    </script>
+
+    <script>
+        var cityPicker = new IIInsomniaCityPicker({
+            data: cityData,
+            target: '#cityChoice3',
+            valType: 'k-v',
+            hideCityInput: '#city3',
+            hideProvinceInput: '#province3',
+            callback: function(city_id){
+                $('#cityChoice3').html(city_id);
+            }
+        });
+
+        cityPicker.init();
+    </script>
+
+
+</body>
+
+</html>

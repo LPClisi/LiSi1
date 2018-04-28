@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lanqiao.CRM.dao.PayRecordDao">    
+
+   
+   
+     <select id="getPage" parameterType="map" resultType="payRecord">
+         select *from payment_record limit #{start},#{end}
+     </select>
+     
+     <select id="findByPaydate" parameterType="map" resultType="payRecord">
+         select * from (select * from payment_record where paydate=${paydate}) a limit #{start},#{end}
+       
+     </select>
+     
+     <select id="getTotal" resultType="int">
+		 select count(*) from payment_record
+	</select>
+	
+	
+	<select id="getTotalByPaydate" parameterType="String" resultType="int">
+	      select count(*) from payment_record where paydate=#{paydate}
+	</select>
+	
+	<insert id="insert" parameterType="payRecord" >
+	    insert into payment_record values(#{fid},null,#{paydate},#{paymoney},#{customer},#{contract},#{payperiod},#{paymethod},#{paytype},#{payee},#{remark})
+	</insert>
+	
+	<delete id="deleteByArray"  parameterType="int[]">
+           delete from payment_record where id in            <!-- collection 后面跟array --> 
+     <foreach collection="array" open="(" item="id" separator="," close=")">#{id}</foreach>
+    </delete>
+	
+    <select id="findById" parameterType="int" resultType="payRecord">
+	  select * from payment_record where id=#{id}
+	  </select>
+	  
+	  <select id="findByCusAndHetong" parameterType="String" resultType="payRecord">
+	     select * from payment_record  where customer=#{param1} and contract=#{param2}
+	  </select>
+ </mapper>
